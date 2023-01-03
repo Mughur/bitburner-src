@@ -483,7 +483,7 @@ export class Industry {
                     office.employeeProd[EmployeePositions.Engineer] / 90 +
                     Math.pow(this.sciResearch, this.sciFac) +
                     Math.pow(warehouse.materials["AI Cores"].qty, this.aiFac) / 10e3;
-                  warehouse.materials[this.prodMats[j]].qlt = Math.min(tempQlt, avgQlt * Math.log10(tempQlt));
+                  tempQlt = Math.min(tempQlt, avgQlt * Math.log10(tempQlt));
                   warehouse.materials[this.prodMats[j]].qlt =
                     (warehouse.materials[this.prodMats[j]].qlt * warehouse.materials[this.prodMats[j]].qty +
                       tempQlt * prod * producableFrac) /
@@ -869,7 +869,7 @@ export class Industry {
             const marketFactor = this.getMarketFactor(product); //Competition + demand
 
             // Calculate Sale Cost (sCost), which could be dynamically evaluated
-            const markupLimit = Math.max(product.data[city][3], 0.1) / product.mku;
+            const markupLimit = Math.max(product.data[city][3], 0.001) / product.mku;
             let sCost;
             if (product.marketTa2) {
               const prod = product.data[city][1];
@@ -906,8 +906,8 @@ export class Industry {
               sCost = optimalPrice;
             } else if (product.marketTa1) {
               sCost = product.pCost + markupLimit;
-            } else if (isString(product.sCost)) {
-              const sCostString = product.sCost as string;
+            } else if (isString(product.sCost[city])) {
+              const sCostString = product.sCost[city] as string;
               if (product.mku === 0) {
                 console.error(`mku is zero, reverting to 1 to avoid Infinity`);
                 product.mku = 1;
@@ -915,7 +915,7 @@ export class Industry {
               sCost = sCostString.replace(/MP/g, product.pCost + product.rat / product.mku + "");
               sCost = Math.max(product.pCost, eval(sCost));
             } else {
-              sCost = product.sCost;
+              sCost = product.sCost[city];
             }
 
             let markup = 1;

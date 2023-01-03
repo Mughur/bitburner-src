@@ -81,9 +81,9 @@ export function ProductElem(props: IProductProps): React.ReactElement {
         {sellButtonText} @ <Money money={product.pCost + markupLimit} />
       </>
     );
-  } else if (product.sCost) {
-    if (isString(product.sCost)) {
-      const sCost = (product.sCost as string).replace(/MP/g, product.pCost + product.rat / product.mku + "");
+  } else if (product.sCost[city]) {
+    if (isString(product.sCost[city])) {
+      const sCost = (product.sCost[city] as string).replace(/MP/g, product.pCost + product.rat / product.mku + "");
       sellButtonText = (
         <>
           {sellButtonText} @ <Money money={eval(sCost)} />
@@ -92,7 +92,7 @@ export function ProductElem(props: IProductProps): React.ReactElement {
     } else {
       sellButtonText = (
         <>
-          {sellButtonText} @ <Money money={product.sCost} />
+          {sellButtonText} @ <Money money={product.sCost[city]} />
         </>
       );
     }
@@ -144,8 +144,9 @@ export function ProductElem(props: IProductProps): React.ReactElement {
             <Tooltip
               title={
                 <Typography>
-                  Effective rating is calculated from product rating and the quality of materials used <br />
-                  Rating: {numeralWrapper.format(product.rat, nf)} <br /> <br />
+                  Effective rating is calculated from product rating <br />
+                  and the quality of materials used <br />
+                  Base rating: {numeralWrapper.format(product.rat, nf)} <br /> <br />
                   Quality: {numeralWrapper.format(product.qlt, nf)} <br />
                   Performance: {numeralWrapper.format(product.per, nf)} <br />
                   Durability: {numeralWrapper.format(product.dur, nf)} <br />
