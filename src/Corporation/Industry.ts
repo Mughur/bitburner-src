@@ -321,7 +321,7 @@ export class Industry {
 
               buyAmt = Math.min(buyAmt, maxAmt);
               if (buyAmt > 0) {
-                mat.qlt = (mat.qlt * mat.qty + 0 * buyAmt) / (mat.qty + buyAmt);
+                mat.qlt = Math.max(0.1,(mat.qlt * mat.qty + 0 * buyAmt) / (mat.qty + buyAmt));
                 mat.qty += buyAmt;
                 expenses += buyAmt * mat.bCost;
               }
@@ -698,9 +698,10 @@ export class Industry {
                         
                       //Pretty sure this can cause some issues if there are multiple sources importing same material to same warehouse
                       //but this will do for now
-                      expWarehouse.materials[matName].qlt =
+                      expWarehouse.materials[matName].qlt = Math.max(0.1,
                       (expWarehouse.materials[matName].qlt * expWarehouse.materials[matName].qty + amt * mat.qlt) /
-                      (expWarehouse.materials[matName].qty + amt);
+                      (expWarehouse.materials[matName].qty + amt));
+
 
                       expWarehouse.materials[matName].qty += amt;
                       mat.qty -= amt;
