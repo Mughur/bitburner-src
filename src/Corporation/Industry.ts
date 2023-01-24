@@ -13,6 +13,7 @@ import { MaterialInfo } from "./MaterialInfo";
 import { Warehouse } from "./Warehouse";
 import { Corporation } from "./Corporation";
 import { CorpMaterialName, CorpResearchName, CorpStateName } from "@nsdefs";
+import { Atm } from "@mui/icons-material";
 
 interface IParams {
   name?: string;
@@ -394,7 +395,7 @@ export class Industry {
             for (const [matName, buyAmt] of Object.entries(smartBuy) as [CorpMaterialName, number][]) {
               const mat = warehouse.materials[matName];
               if (buyAmt === undefined) throw new Error(`Somehow smartbuy matname is undefined`);
-              mat.qlt = (mat.qlt * mat.qty + 0 * buyAmt) / (mat.qty + buyAmt);
+              if (mat.qty + buyAmt != 0)mat.qlt = (mat.qlt * mat.qty + 0 * buyAmt) / (mat.qty + buyAmt);
               mat.qty += buyAmt;
               expenses += buyAmt * mat.bCost;
             }
@@ -465,7 +466,7 @@ export class Industry {
 
               // Make our materials if they are producable
               if (producableFrac > 0 && prod > 0) {
-                let avgQlt = 0;
+                let avgQlt = 1;
                 for (const reqMatName of Object.keys(this.reqMats) as CorpMaterialName[]) {
 
                   const reqMat = this.reqMats[reqMatName];
@@ -483,12 +484,12 @@ export class Industry {
                     office.employeeProd[EmployeePositions.Engineer] / 90 +
                     Math.pow(this.sciResearch, this.sciFac) +
                     Math.pow(warehouse.materials["AI Cores"].qty, this.aiFac) / 10e3;
-                  tempQlt = Math.min(tempQlt, avgQlt * Math.log10(tempQlt));
+                  const logQlt = Math.max(Math.log10(tempQlt),1);
+                  tempQlt = Math.min(tempQlt, avgQlt * logQlt);
                   warehouse.materials[this.prodMats[j]].qlt =
                     (warehouse.materials[this.prodMats[j]].qlt * warehouse.materials[this.prodMats[j]].qty +
                       tempQlt * prod * producableFrac) /
                     (warehouse.materials[this.prodMats[j]].qty + prod * producableFrac);
-
                   warehouse.materials[this.prodMats[j]].qty += prod * producableFrac;
                 }
               } else {
@@ -702,7 +703,6 @@ export class Industry {
                       (expWarehouse.materials[matName].qlt * expWarehouse.materials[matName].qty + amt * mat.qlt) /
                       (expWarehouse.materials[matName].qty + amt));
 
-
                       expWarehouse.materials[matName].qty += amt;
                       mat.qty -= amt;
                       mat.totalExp += amt;
@@ -832,7 +832,7 @@ export class Industry {
 
             //Make our Products if they are producable
             if (producableFrac > 0 && prod > 0) {
-              let avgQlt = 0;
+              let avgQlt = 1;
               for (const [reqMatName, reqQty] of Object.entries(product.reqMats) as [CorpMaterialName, number][]) {
                 const reqMatQtyNeeded = reqQty * prod * producableFrac;
                 warehouse.materials[reqMatName].qty -= reqMatQtyNeeded;
@@ -841,7 +841,7 @@ export class Industry {
                   avgQlt += warehouse.materials[reqMatName].qlt;
               }
               avgQlt /= Object.keys(product.reqMats).length;
-              const tempEffRat = Math.min(product.qlt, avgQlt * Math.log10(product.qlt));
+              const tempEffRat = Math.min(product.rat, avgQlt * Math.log10(product.rat));
               //Effective Rating
               product.data[city][3] =
                 (product.data[city][3] * product.data[city][0] + tempEffRat * prod * producableFrac) /
