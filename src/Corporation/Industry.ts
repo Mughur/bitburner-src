@@ -468,8 +468,9 @@ export class Industry {
               // Make our materials if they are producable
               if (producableFrac > 0 && prod > 0) {
                 let avgQlt = 1;
+                let divider = 0;
                 for (const reqMatName of Object.keys(this.reqMats) as CorpMaterialName[]) {
-
+                  if (reqMatName == "Energy")continue;
                   const reqMat = this.reqMats[reqMatName];
                   if (reqMat === undefined) continue;
                   const reqMatQtyNeeded = reqMat * prod * producableFrac;
@@ -478,8 +479,9 @@ export class Industry {
                   warehouse.materials[reqMatName].prd -=
                     reqMatQtyNeeded / (corpConstants.secondsPerMarketCycle * marketCycles);
                   avgQlt += warehouse.materials[reqMatName].qlt;
+                  divider++;
                 }
-                avgQlt /= Object.keys(this.reqMats).length;
+                avgQlt /= divider;
                 for (let j = 0; j < this.prodMats.length; ++j) {
                   let tempQlt =
                     office.employeeProd[EmployeePositions.Engineer] / 90 +
