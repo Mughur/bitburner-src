@@ -14,6 +14,7 @@ import { Warehouse } from "./Warehouse";
 import { Corporation } from "./Corporation";
 import { CorpMaterialName, CorpResearchName, CorpStateName } from "@nsdefs";
 import { Atm } from "@mui/icons-material";
+import { Player } from "@player";
 
 interface IParams {
   name?: string;
@@ -647,9 +648,38 @@ export class Industry {
                 mat.totalExp = 0; //Reset export
                 for (let expI = 0; expI < mat.exp.length; ++expI) {
                   const exp = mat.exp[expI];
-                  const amtStr = exp.amt.replace(
+
+                  const expIndustry = corporation.divisions.find((div) => div.name === exp.ind);
+                  if (!expIndustry) {
+                    console.error(`Invalid export! ${exp.ind}`);
+                    continue;
+                  }
+                  const expWarehouse = expIndustry.warehouses[exp.city]
+                  if (!expWarehouse) {
+                    console.error(`Invalid export! ${expIndustry.name} ${exp.city}`);
+                    continue;
+                  }
+                  const tempMaterial = expWarehouse.materials[matName];
+
+                  let amtStr = exp.amt.replace(
                     /MAX/g,
                     (mat.qty / (corpConstants.secondsPerMarketCycle * marketCycles) + "").toUpperCase(),
+                  );
+                  amtStr = amtStr.replace(
+                    /EPROD/g,
+                    mat.prd.toString()
+                  );
+                  amtStr = amtStr.replace(
+                    /IPROD/g,
+                    tempMaterial.prd.toString()
+                  );
+                  amtStr = amtStr.replace(
+                    /EINV/g,
+                    mat.qty.toString()
+                  );
+                  amtStr = amtStr.replace(
+                    /IINV/g,
+                    tempMaterial.qty.toString()
                   );
                   let amt = 0;
                   try {
@@ -671,45 +701,34 @@ export class Industry {
                   if (mat.qty < amt) {
                     amt = mat.qty;
                   }
-                  if (amt === 0) {
-                    break; //None left
+                  if (amt <= 0) {
+                    continue;
                   }
-                  for (let foo = 0; foo < corporation.divisions.length; ++foo) {
-                    if (corporation.divisions[foo].name === exp.ind) {
-                      const expIndustry = corporation.divisions[foo];
-                      const expWarehouse = expIndustry.warehouses[exp.city];
-                      if (!expWarehouse) {
-                        console.error(`Invalid export! ${expIndustry.name} ${exp.city}`);
-                        break;
-                      }
 
-                      // Make sure theres enough space in warehouse
-                      if (expWarehouse.sizeUsed >= expWarehouse.size) {
-                        // Warehouse at capacity. Exporting doesn't
-                        // affect revenue so just return 0's
-                        return [0, 0];
-                      } else {
-                        const maxAmt = Math.floor(
-                          (expWarehouse.size - expWarehouse.sizeUsed) / MaterialInfo[matName].size,
-                        );
-                        amt = Math.min(maxAmt, amt);
-                      }
-                      expWarehouse.materials[matName].imp +=
-                        amt / (corpConstants.secondsPerMarketCycle * marketCycles);
-                        
-                      //Pretty sure this can cause some issues if there are multiple sources importing same material to same warehouse
-                      //but this will do for now
-                      expWarehouse.materials[matName].qlt = Math.max(0.1,
-                      (expWarehouse.materials[matName].qlt * expWarehouse.materials[matName].qty + amt * mat.qlt) /
-                      (expWarehouse.materials[matName].qty + amt));
-
-                      expWarehouse.materials[matName].qty += amt;
-                      mat.qty -= amt;
-                      mat.totalExp += amt;
-                      expIndustry.updateWarehouseSizeUsed(expWarehouse);
-                      break;
-                    }
+                  // Make sure theres enough space in warehouse
+                  if (expWarehouse.sizeUsed >= expWarehouse.size) {
+                    // Warehouse at capacity. Exporting doesn't
+                    // affect revenue so just return 0's
+                    continue;
+                  } else {
+                    const maxAmt = Math.floor(
+                      (expWarehouse.size - expWarehouse.sizeUsed) / MaterialInfo[matName].size,
+                    );
+                    amt = Math.min(maxAmt, amt);
                   }
+                  expWarehouse.materials[matName].imp +=
+                    amt / (corpConstants.secondsPerMarketCycle * marketCycles);
+                    
+                  //Pretty sure this can cause some issues if there are multiple sources importing same material to same warehouse
+                  //but this will do for now
+                  expWarehouse.materials[matName].qlt = Math.max(0.1,
+                  (expWarehouse.materials[matName].qlt * expWarehouse.materials[matName].qty + amt * mat.qlt) /
+                  (expWarehouse.materials[matName].qty + amt));
+
+                  expWarehouse.materials[matName].qty += amt;
+                  mat.qty -= amt;
+                  mat.totalExp += amt;
+                  expIndustry.updateWarehouseSizeUsed(expWarehouse);
                 }
                 //totalExp should be per second
                 mat.totalExp /= corpConstants.secondsPerMarketCycle * marketCycles;
