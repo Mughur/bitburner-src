@@ -13,8 +13,6 @@ import { MaterialInfo } from "./MaterialInfo";
 import { Warehouse } from "./Warehouse";
 import { Corporation } from "./Corporation";
 import { CorpMaterialName, CorpResearchName, CorpStateName } from "@nsdefs";
-import { Atm } from "@mui/icons-material";
-import { Player } from "@player";
 
 interface IParams {
   name?: string;
@@ -323,7 +321,7 @@ export class Industry {
 
               buyAmt = Math.min(buyAmt, maxAmt);
               if (buyAmt > 0) {
-                mat.qlt = Math.max(0.1,(mat.qlt * mat.qty + 0 * buyAmt) / (mat.qty + buyAmt));
+                mat.qlt = Math.max(0.1, (mat.qlt * mat.qty + 0 * buyAmt) / (mat.qty + buyAmt));
                 mat.qty += buyAmt;
                 expenses += buyAmt * mat.bCost;
               }
@@ -396,7 +394,7 @@ export class Industry {
             for (const [matName, buyAmt] of Object.entries(smartBuy) as [CorpMaterialName, number][]) {
               const mat = warehouse.materials[matName];
               if (buyAmt === undefined) throw new Error(`Somehow smartbuy matname is undefined`);
-              if (mat.qty + buyAmt != 0)mat.qlt = (mat.qlt * mat.qty + 0 * buyAmt) / (mat.qty + buyAmt);
+              if (mat.qty + buyAmt != 0) mat.qlt = (mat.qlt * mat.qty + 0 * buyAmt) / (mat.qty + buyAmt);
               mat.qty += buyAmt;
               expenses += buyAmt * mat.bCost;
             }
@@ -470,9 +468,8 @@ export class Industry {
                 let avgQlt = 1;
                 let divider = 0;
                 for (const reqMatName of Object.keys(this.reqMats) as CorpMaterialName[]) {
-                  
                   //temporarily ignore energy in here, will be moved
-                  if (reqMatName == "Energy")continue;
+                  if (reqMatName == "Energy") continue;
 
                   const reqMat = this.reqMats[reqMatName];
                   if (reqMat === undefined) continue;
@@ -490,7 +487,7 @@ export class Industry {
                     office.employeeProd[EmployeePositions.Engineer] / 90 +
                     Math.pow(this.sciResearch, this.sciFac) +
                     Math.pow(warehouse.materials["AI Cores"].qty, this.aiFac) / 10e3;
-                  const logQlt = Math.max(Math.log10(tempQlt),1);
+                  const logQlt = Math.max(Math.log10(tempQlt), 1);
                   tempQlt = Math.min(tempQlt, avgQlt * logQlt);
                   warehouse.materials[this.prodMats[j]].qlt =
                     (warehouse.materials[this.prodMats[j]].qlt * warehouse.materials[this.prodMats[j]].qty +
@@ -659,7 +656,7 @@ export class Industry {
                     console.error(`Invalid export! ${exp.ind}`);
                     continue;
                   }
-                  const expWarehouse = expIndustry.warehouses[exp.city]
+                  const expWarehouse = expIndustry.warehouses[exp.city];
                   if (!expWarehouse) {
                     console.error(`Invalid export! ${expIndustry.name} ${exp.city}`);
                     continue;
@@ -670,22 +667,10 @@ export class Industry {
                     /MAX/g,
                     (mat.qty / (corpConstants.secondsPerMarketCycle * marketCycles) + "").toUpperCase(),
                   );
-                  amtStr = amtStr.replace(
-                    /EPROD/g,
-                    mat.prd.toString()
-                  );
-                  amtStr = amtStr.replace(
-                    /IPROD/g,
-                    tempMaterial.prd.toString()
-                  );
-                  amtStr = amtStr.replace(
-                    /EINV/g,
-                    mat.qty.toString()
-                  );
-                  amtStr = amtStr.replace(
-                    /IINV/g,
-                    tempMaterial.qty.toString()
-                  );
+                  amtStr = amtStr.replace(/EPROD/g, mat.prd.toString());
+                  amtStr = amtStr.replace(/IPROD/g, tempMaterial.prd.toString());
+                  amtStr = amtStr.replace(/EINV/g, mat.qty.toString());
+                  amtStr = amtStr.replace(/IINV/g, tempMaterial.qty.toString());
                   let amt = 0;
                   try {
                     amt = eval(amtStr);
@@ -716,19 +701,18 @@ export class Industry {
                     // affect revenue so just return 0's
                     continue;
                   } else {
-                    const maxAmt = Math.floor(
-                      (expWarehouse.size - expWarehouse.sizeUsed) / MaterialInfo[matName].size,
-                    );
+                    const maxAmt = Math.floor((expWarehouse.size - expWarehouse.sizeUsed) / MaterialInfo[matName].size);
                     amt = Math.min(maxAmt, amt);
                   }
-                  expWarehouse.materials[matName].imp +=
-                    amt / (corpConstants.secondsPerMarketCycle * marketCycles);
-                    
+                  expWarehouse.materials[matName].imp += amt / (corpConstants.secondsPerMarketCycle * marketCycles);
+
                   //Pretty sure this can cause some issues if there are multiple sources importing same material to same warehouse
                   //but this will do for now
-                  expWarehouse.materials[matName].qlt = Math.max(0.1,
-                  (expWarehouse.materials[matName].qlt * expWarehouse.materials[matName].qty + amt * mat.qlt) /
-                  (expWarehouse.materials[matName].qty + amt));
+                  expWarehouse.materials[matName].qlt = Math.max(
+                    0.1,
+                    (expWarehouse.materials[matName].qlt * expWarehouse.materials[matName].qty + amt * mat.qlt) /
+                      (expWarehouse.materials[matName].qty + amt),
+                  );
 
                   expWarehouse.materials[matName].qty += amt;
                   mat.qty -= amt;
@@ -862,7 +846,7 @@ export class Industry {
                 warehouse.materials[reqMatName].qty -= reqMatQtyNeeded;
                 warehouse.materials[reqMatName].prd -=
                   reqMatQtyNeeded / (corpConstants.secondsPerMarketCycle * marketCycles);
-                  avgQlt += warehouse.materials[reqMatName].qlt;
+                avgQlt += warehouse.materials[reqMatName].qlt;
               }
               avgQlt /= Object.keys(product.reqMats).length;
               const tempEffRat = Math.min(product.rat, avgQlt * Math.log10(product.rat));
