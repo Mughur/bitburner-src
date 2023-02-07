@@ -470,7 +470,10 @@ export class Industry {
                 let avgQlt = 1;
                 let divider = 0;
                 for (const reqMatName of Object.keys(this.reqMats) as CorpMaterialName[]) {
+                  
+                  //temporarily ignore energy in here, will be moved
                   if (reqMatName == "Energy")continue;
+
                   const reqMat = this.reqMats[reqMatName];
                   if (reqMat === undefined) continue;
                   const reqMatQtyNeeded = reqMat * prod * producableFrac;
