@@ -3,7 +3,7 @@ name: "AutoD"
 on:
   push:
     branches:
-      - "corp-gameplay"
+      - "publishtest"
 
 permissions:
   contents: read
