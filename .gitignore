@@ -21,6 +21,6 @@ Netburner.txt
 .vscode
 
 .idea/
-*.bundle.*
+ *.bundle.*
  index.html
 tsdoc-metadata.json
