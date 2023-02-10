@@ -13,9 +13,9 @@ Netburner.txt
 .cypress
 
 # tmp folder for build and electron
-# .app
-# .package
-# .build
+ .app
+ .package
+ .build
 
 # editor files
 .vscode
