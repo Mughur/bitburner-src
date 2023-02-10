@@ -17,6 +17,7 @@ import { isRelevantMaterial } from "./ui/Helpers";
 import { CityName } from "../Enums";
 import { getRandomInt } from "../utils/helpers/getRandomInt";
 import { CorpResearchName } from "@nsdefs";
+import { calculateUpgradeCost } from "./Helpers";
 
 export function NewIndustry(corporation: Corporation, industry: IndustryType, name: string): void {
   if (corporation.divisions.find(({ type }) => industry == type))
@@ -71,11 +72,8 @@ export function UnlockUpgrade(corporation: Corporation, upgrade: CorporationUnlo
   corporation.unlock(upgrade);
 }
 
-export function LevelUpgrade(corporation: Corporation, upgrade: CorporationUpgrade): void {
-  const baseCost = upgrade.basePrice;
-  const priceMult = upgrade.priceMult;
-  const level = corporation.upgrades[upgrade.index];
-  const cost = baseCost * Math.pow(priceMult, level);
+export function LevelUpgrade(corporation: Corporation, upgrade: CorporationUpgrade, amount: number): void {
+  const cost = calculateUpgradeCost(corporation,upgrade,amount);
   if (corporation.funds < cost) {
     throw new Error("Insufficient funds");
   } else {

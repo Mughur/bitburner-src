@@ -33,6 +33,18 @@ import Grid from "@mui/material/Grid";
 interface IProps {
   rerender: () => void;
 }
+const [purchaseMultiplier, setPurchaseMultiplier] = useState<number | "MAX">(corpConstants.PurchaseMultipliers.x1);
+
+// onClick event handlers for purchase multiplier buttons
+const purchaseMultiplierOnClicks = [
+  () => setPurchaseMultiplier(corpConstants.PurchaseMultipliers.x1),
+  () => setPurchaseMultiplier(corpConstants.PurchaseMultipliers.x5),
+  () => setPurchaseMultiplier(corpConstants.PurchaseMultipliers.x10),
+  () => setPurchaseMultiplier(corpConstants.PurchaseMultipliers.x50),
+  () => setPurchaseMultiplier(corpConstants.PurchaseMultipliers.x100),
+  () => setPurchaseMultiplier(corpConstants.PurchaseMultipliers.MAX),
+];
+
 export function Overview({ rerender }: IProps): React.ReactElement {
   const corp = useCorporation();
   const profit: number = corp.revenue - corp.expenses;

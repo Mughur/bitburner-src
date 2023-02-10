@@ -7505,8 +7505,9 @@ export type Corporation = {
   unlockUpgrade(upgradeName: string): void;
 
   /** Level an upgrade.
-   * @param upgradeName - Name of the upgrade */
-  levelUpgrade(upgradeName: string): void;
+   * @param upgradeName - Name of the upgrade
+   * @param amount - Number of levels to upgrade */
+  levelUpgrade(upgradeName: string, amount?: number): void;
 
   /** Issue dividends
    * @param rate - Fraction of profit to issue as dividends. */

@@ -30,7 +30,7 @@ export function LevelableUpgrade(props: IProps): React.ReactElement {
   function onClick(): void {
     if (corp.funds < cost) return;
     try {
-      LevelUpgrade(corp, props.upgrade);
+      LevelUpgrade(corp, props.upgrade, 1);
     } catch (err) {
       dialogBoxCreate(err + "");
     }

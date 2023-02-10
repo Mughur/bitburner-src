@@ -760,13 +760,15 @@ export function NetscriptCorporation(): InternalAPI<NSCorporation> {
       if (upgrade === undefined) throw new Error(`No upgrade named '${upgradeName}'`);
       UnlockUpgrade(corporation, upgrade);
     },
-    levelUpgrade: (ctx) => (_upgradeName) => {
+    levelUpgrade: (ctx) => (_upgradeName, _amount) => {
       checkAccess(ctx);
       const upgradeName = helpers.string(ctx, "upgradeName", _upgradeName);
+      if (_amount == undefined) _amount = 1;
+      const amount = helpers.number(ctx, "amount", _amount);
       const corporation = getCorporation();
       const upgrade = Object.values(CorporationUpgrades).find((upgrade) => upgrade.name === upgradeName);
       if (upgrade === undefined) throw new Error(`No upgrade named '${upgradeName}'`);
-      LevelUpgrade(corporation, upgrade);
+      LevelUpgrade(corporation, upgrade, amount);
     },
     issueDividends: (ctx) => (_rate) => {
       checkAccess(ctx);
