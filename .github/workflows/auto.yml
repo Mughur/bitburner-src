@@ -1,4 +1,4 @@
-name: "Deploy new dev build"
+name: "AutoD"
 
 on:
   push:
